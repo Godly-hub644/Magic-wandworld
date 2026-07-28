@@ -1,57 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MAGIC WAND WORLD - OPEN MAP</title>
+  <title>MAGIC WAND WORLD V2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { margin: 0; overflow: hidden; font-family: Arial; }
-    #info { position: absolute; bottom: 20px; width: 100%; text-align: center; color: white; background: rgba(0,0,0,0.6); padding: 10px; z-index: 10; }
+    body { margin: 0; overflow: hidden; }
+    #info { position: absolute; bottom: 100px; width: 100%; text-align: center; color: white; background: rgba(0,0,0,0.5); padding: 10px; z-index: 10; }
+    /* JOYSTICK */
+    #joystick { position: absolute; bottom: 30px; left: 30px; width: 120px; height: 120px; background: rgba(255,255,255,0.2); border-radius: 50%; z-index: 20; }
+    #stick { position: absolute; width: 50px; height: 50px; background: white; border-radius: 50%; top: 35px; left: 35px; }
   </style>
   <script type="importmap">{"imports": {"three": "https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
 </head>
 <body>
-  <div id="info">WASD = Walk | Click colored zones to enter kingdoms</div>
+  <div id="info">Drag joystick to walk | Click colored zones</div>
+  <div id="joystick"><div id="stick"></div></div>
   <script type="module">
     import * as THREE from 'three';
     const scene=new THREE.Scene(); scene.background=new THREE.Color(0x87CEEB);
     const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
     const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(innerWidth,innerHeight); document.body.appendChild(renderer.domElement);
     
-    // BIG OPEN WORLD GROUND
+    // BIG WORLD
     const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0x228B22})); 
     ground.rotation.x=-Math.PI/2; scene.add(ground);
     
-    // PLAYER
-    const player=new THREE.Mesh(new THREE.CapsuleGeometry(0.5,1.5),new THREE.MeshStandardMaterial({color:0x00aaff})); 
-    player.position.set(0,1,0); scene.add(player);
+    // REAL CHARACTER - PIRATE STYLE like your pic
+    const group=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1),new THREE.MeshStandardMaterial({color:0x003366})); // blue coat
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.4),new THREE.MeshStandardMaterial({color:0xffdbac})); head.position.y=0.9;
+    const hat=new THREE.Mesh(new THREE.ConeGeometry(0.5,0.4),new THREE.MeshStandardMaterial({color:0x8B4513})); hat.position.y=1.1; // pirate hat
+    group.add(body,head,hat); group.position.set(0,1,0); scene.add(group);
+    
     scene.add(new THREE.AmbientLight(0xffffff,1.2));
-    camera.position.set(0,10,15); camera.lookAt(0,0,0);
+    camera.position.set(0,8,12); camera.lookAt(0,0,0);
 
-    // 4 KINGDOM ZONES - LIKE GTA MAP ICONS
+    // 4 KINGDOM ZONES
     const kingdoms=[
-      {name:"Sunset", pos:[-40,0,-40], color:0xff8800, quest:"Collect Crystals"},
-      {name:"Ice", pos:[40,0,-40], color:0x88ddff, quest:"Rescue Villager"},
-      {name:"Forest", pos:[-40,0,40], color:0x006400, quest:"Fight Slimes"},
-      {name:"Dragon", pos:[40,0,40], color:0xaa0000, quest:"Race to Volcano"}
+      {name:"Sunset", pos:[-40,0,-40], color:0xff8800},
+      {name:"Ice", pos:[40,0,-40], color:0x88ddff},
+      {name:"Forest", pos:[-40,0,40], color:0x006400},
+      {name:"Dragon", pos:[40,0,40], color:0xaa0000}
     ];
     
     kingdoms.forEach(k=>{
-      // Big colored ground zone
-      const zone=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.MeshStandardMaterial({color:k.color,transparent:true,opacity:0.6}));
-      zone.rotation.x=-Math.PI/2; zone.position.set(k.pos[0],0.1,k.pos[2]); scene.add(zone);
-      // Trees in forest
-      if(k.name==="Forest"){ for(let i=0;i<20;i++){ const t=new THREE.Mesh(new THREE.ConeGeometry(2,5),new THREE.MeshStandardMaterial({color:0x006400})); t.position.set(k.pos[0]+Math.random()*20-10,2.5,k.pos[2]+Math.random()*20-10); scene.add(t);}}
-    });
-
-    const keys={}; document.addEventListener('keydown',e=>keys[e.key]=true);
-    function animate(){
-      requestAnimationFrame(animate);
-      if(keys['w'])player.position.z-=0.2; if(keys['s'])player.position.z+=0.2;
-      if(keys['a'])player.position.x-=0.2; if(keys['d'])player.position.x+=0.2;
-      camera.position.x=player.position.x; camera.position.z=player.position.z+15; camera.lookAt(player.position);
-      renderer.render(scene,camera);
-    }
-    animate();
-  </script>
-</body>
-</html>
+      const zone=new THREE.Mesh(new THREE.PlaneGeometry

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MAGIC WAND WORLD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Arial Black'; }
+    #ui { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: gold; padding: 15px; border-radius: 15px; z-index: 10; }
+    #map { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,0.85); padding: 30px; border-radius: 30px; text-align: center; color: white; z-index: 10; }
+    .kingdom { width: 220px; height: 100px; margin: 10px; border-radius: 20px; font-size: 16px; cursor: pointer; border: 3px solid gold; color: white; font-weight: bold; }
+  </style>
+  <script type="importmap">{"imports": {"three": "https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+  <div id="ui">KINGDOM: <span id="kingdom">Map</span><br>QUEST: <span id="quest">Choose Kingdom</span></div>
+  
+  <div id="map">
+    <h1>✨ MAGIC WAND WORLD ✨</h1>
+    <button class="kingdom" style="background: linear-gradient(#FFA500, #FF4500);" onclick="startKingdom(1)">🌅 Sunset Kingdom<br>Collect Crystals</button><br>
+    <button class="kingdom" style="background: linear-gradient(#ADD8E6, #87CEEB);" onclick="startKingdom(2)">❄️ Ice Kingdom<br>Rescue Villager</button><br>
+    <button class="kingdom" style="background: linear-gradient(#228B22, #006400);" onclick="startKingdom(3)">🌲 Emerald Forest<br>Fight Slimes</button><br>
+    <button class="kingdom" style="background: linear-gradient(#8B0000, #FF4500);" onclick="startKingdom(4)">🐉 Dragon Kingdom<br>Race to Volcano</button>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    let currentKingdom=0, gameObjects=[];
+    const scene=new THREE.Scene(); 
+    const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
+    const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(innerWidth,innerHeight); document.body.appendChild(renderer.domElement);
+    
+    const player=new THREE.Mesh(new THREE.CapsuleGeometry(0.3,1),new THREE.MeshStandardMaterial({color:0x66ccff})); 
+    player.position.y=0.8; scene.add(player);
+    scene.add(new THREE.AmbientLight(0xffffff,1));
+
+    function startKingdom(k){ 
+      document.getElementById('map').style.display='none'; 
+      currentKingdom=k;
+      loadKingdom(k);
+    }
+
+    function loadKingdom(k){
+      gameObjects.forEach(obj=>scene.remove(obj)); gameObjects=[];
+      
+      if(k===1){ // SUNSET
+        document.getElementById('kingdom').innerText='Sunset Kingdom';
+        document.getElementById('quest').innerText='Collect 3 Crystals';
+        const ground=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0xffd700})); ground.rotation.x=-Math.PI/2; scene.add(ground);
+      }
+      if(k===2){ // ICE
+        document.getElementById('kingdom').innerText='Ice Kingdom';
+        document.getElementById('quest').innerText='Rescue the Villager';
+        const ground=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0xE0FFFF})); ground.rotation.x=-Math.PI/2; scene.add(ground);
+      }
+      if(k===3){ // FOREST - FIGHT LEVEL
+        document.getElementById('kingdom').innerText='Emerald Forest';
+        document.getElementById('quest').innerText='Defeat 3 Forest Slimes';
+        const ground=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0x228B22})); ground.rotation.x=-Math.PI/2; scene.add(ground);
+        for(let i=0;i<15;i++){ 
+          const tree=new THREE.Group();
+          const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,2),new THREE.MeshStandardMaterial({color:0x8B4513}));
+          const leaves=new THREE.Mesh(new THREE.ConeGeometry(1,2),new THREE.MeshStandardMaterial({color:0x006400}));
+          leaves.position.y=1.5; tree.add(trunk); tree.add(leaves);
+          tree.position.set(Math.random()*20-10,1,Math.random()*20-10); gameObjects.push(tree); scene.add(tree);
+        }
+        for(let i=0;i<3;i++){ 
+          const e=new THREE.Mesh(new THREE.SphereGeometry(0.5),new THREE.MeshStandardMaterial({color:0xff0000})); 
+          e.position.set(Math.random()*15-7,0
